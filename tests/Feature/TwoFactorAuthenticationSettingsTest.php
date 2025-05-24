@@ -9,22 +9,22 @@ use Laravel\Jetstream\Http\Livewire\TwoFactorAuthenticationForm;
 use Livewire\Livewire;
 use Tests\TestCase;
 
-class TwoFactorAuthenticationSettingsTest extends TestCase
-{
+class TwoFactorAuthenticationSettingsTest extends TestCase {
+
     use RefreshDatabase;
 
-    public function test_two_factor_authentication_can_be_enabled(): void
-    {
-        if (! Features::canManageTwoFactorAuthentication()) {
+    public function test_two_factor_authentication_can_be_enabled(): void {
+        if (!Features::canManageTwoFactorAuthentication()) {
             $this->markTestSkipped('Two factor authentication is not enabled.');
         }
 
         $this->actingAs($user = User::factory()->create());
 
-        $this->withSession(['auth.password_confirmed_at' => time()]);
+        $this->withSession([
+            'auth.password_confirmed_at' => time()
+        ]);
 
-        Livewire::test(TwoFactorAuthenticationForm::class)
-            ->call('enableTwoFactorAuthentication');
+        Livewire::test(TwoFactorAuthenticationForm::class)->call('enableTwoFactorAuthentication');
 
         $user = $user->fresh();
 
@@ -32,19 +32,18 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
         $this->assertCount(8, $user->recoveryCodes());
     }
 
-    public function test_recovery_codes_can_be_regenerated(): void
-    {
-        if (! Features::canManageTwoFactorAuthentication()) {
+    public function test_recovery_codes_can_be_regenerated(): void {
+        if (!Features::canManageTwoFactorAuthentication()) {
             $this->markTestSkipped('Two factor authentication is not enabled.');
         }
 
         $this->actingAs($user = User::factory()->create());
 
-        $this->withSession(['auth.password_confirmed_at' => time()]);
+        $this->withSession([
+            'auth.password_confirmed_at' => time()
+        ]);
 
-        $component = Livewire::test(TwoFactorAuthenticationForm::class)
-            ->call('enableTwoFactorAuthentication')
-            ->call('regenerateRecoveryCodes');
+        $component = Livewire::test(TwoFactorAuthenticationForm::class)->call('enableTwoFactorAuthentication')->call('regenerateRecoveryCodes');
 
         $user = $user->fresh();
 
@@ -54,18 +53,18 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
         $this->assertCount(8, array_diff($user->recoveryCodes(), $user->fresh()->recoveryCodes()));
     }
 
-    public function test_two_factor_authentication_can_be_disabled(): void
-    {
-        if (! Features::canManageTwoFactorAuthentication()) {
+    public function test_two_factor_authentication_can_be_disabled(): void {
+        if (!Features::canManageTwoFactorAuthentication()) {
             $this->markTestSkipped('Two factor authentication is not enabled.');
         }
 
         $this->actingAs($user = User::factory()->create());
 
-        $this->withSession(['auth.password_confirmed_at' => time()]);
+        $this->withSession([
+            'auth.password_confirmed_at' => time()
+        ]);
 
-        $component = Livewire::test(TwoFactorAuthenticationForm::class)
-            ->call('enableTwoFactorAuthentication');
+        $component = Livewire::test(TwoFactorAuthenticationForm::class)->call('enableTwoFactorAuthentication');
 
         $this->assertNotNull($user->fresh()->two_factor_secret);
 
@@ -73,4 +72,5 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
 
         $this->assertNull($user->fresh()->two_factor_secret);
     }
+
 }

@@ -10,13 +10,12 @@ use Laravel\Jetstream\Http\Livewire\ApiTokenManager;
 use Livewire\Livewire;
 use Tests\TestCase;
 
-class DeleteApiTokenTest extends TestCase
-{
+class DeleteApiTokenTest extends TestCase {
+
     use RefreshDatabase;
 
-    public function test_api_tokens_can_be_deleted(): void
-    {
-        if (! Features::hasApiFeatures()) {
+    public function test_api_tokens_can_be_deleted(): void {
+        if (!Features::hasApiFeatures()) {
             $this->markTestSkipped('API support is not enabled.');
         }
 
@@ -25,13 +24,17 @@ class DeleteApiTokenTest extends TestCase
         $token = $user->tokens()->create([
             'name' => 'Test Token',
             'token' => Str::random(40),
-            'abilities' => ['create', 'read'],
+            'abilities' => [
+                'create',
+                'read'
+            ]
         ]);
 
-        Livewire::test(ApiTokenManager::class)
-            ->set(['apiTokenIdBeingDeleted' => $token->id])
-            ->call('deleteApiToken');
+        Livewire::test(ApiTokenManager::class)->set([
+            'apiTokenIdBeingDeleted' => $token->id
+        ])->call('deleteApiToken');
 
         $this->assertCount(0, $user->fresh()->tokens);
     }
+
 }

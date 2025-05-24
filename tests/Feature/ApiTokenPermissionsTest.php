@@ -10,13 +10,12 @@ use Laravel\Jetstream\Http\Livewire\ApiTokenManager;
 use Livewire\Livewire;
 use Tests\TestCase;
 
-class ApiTokenPermissionsTest extends TestCase
-{
+class ApiTokenPermissionsTest extends TestCase {
+
     use RefreshDatabase;
 
-    public function test_api_token_permissions_can_be_updated(): void
-    {
-        if (! Features::hasApiFeatures()) {
+    public function test_api_token_permissions_can_be_updated(): void {
+        if (!Features::hasApiFeatures()) {
             $this->markTestSkipped('API support is not enabled.');
         }
 
@@ -25,21 +24,26 @@ class ApiTokenPermissionsTest extends TestCase
         $token = $user->tokens()->create([
             'name' => 'Test Token',
             'token' => Str::random(40),
-            'abilities' => ['create', 'read'],
+            'abilities' => [
+                'create',
+                'read'
+            ]
         ]);
 
-        Livewire::test(ApiTokenManager::class)
-            ->set(['managingPermissionsFor' => $token])
-            ->set(['updateApiTokenForm' => [
+        Livewire::test(ApiTokenManager::class)->set([
+            'managingPermissionsFor' => $token
+        ])->set([
+            'updateApiTokenForm' => [
                 'permissions' => [
                     'delete',
-                    'missing-permission',
-                ],
-            ]])
-            ->call('updateApiToken');
+                    'missing-permission'
+                ]
+            ]
+        ])->call('updateApiToken');
 
         $this->assertTrue($user->fresh()->tokens->first()->can('delete'));
         $this->assertFalse($user->fresh()->tokens->first()->can('read'));
         $this->assertFalse($user->fresh()->tokens->first()->can('missing-permission'));
     }
+
 }
